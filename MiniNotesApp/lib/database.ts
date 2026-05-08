@@ -5,6 +5,7 @@ export type Task = {
     title: string;
     description: string;
     category: string;
+    priority: string;
     status: string;
     created_at: string;
 };
@@ -24,6 +25,7 @@ export function initDatabase() {
                 title TEXT NOT NULL,
                 description TEXT,
                 category TEXT DEFAULT 'Personal',
+                priority TEXT DEFAULT 'None',
                 status TEXT DEFAULT 'Pending',
                 created_at TEXT
             )`
