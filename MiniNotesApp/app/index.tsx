@@ -15,13 +15,14 @@ export default function Homescreen() {
   }, []);
 
   const handleOpenNotes = () => {
-    router.push("/tasks");
+    router.push("/(tabs)/notes");
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>🎀 Doll Notes 🎀</Text>
+        <Text style={styles.emoji}>🎀</Text>
+        <Text style={styles.title}>Doll Notes</Text>
         <Text style={styles.subtitle}>Keep track of your important notes!</Text>
       </View>
 
@@ -42,38 +43,50 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f9f0f5",
   },
   content: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  emoji: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
   title: {
     fontSize: 36,
-    fontWeight: "bold",
+    fontWeight: "800",
     marginBottom: 10,
     textAlign: "center",
-    color: "#333",
+    color: "#FF6B9D",
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#bbb",
     textAlign: "center",
+    fontWeight: "500",
   },
   button: {
-    backgroundColor: "#FFB3D9",
-    paddingVertical: 14,
+    backgroundColor: "#ffb1cbff",
+    paddingVertical: 15,
     paddingHorizontal: 40,
-    borderRadius: 8,
-    marginBottom: 30,
+    borderRadius: 30,
+    marginBottom: 40,
     width: "100%",
     maxWidth: 300,
+    shadowColor: "#FF6B9D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 5,
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "800",
     textAlign: "center",
+    letterSpacing: 0.3,
   },
 });

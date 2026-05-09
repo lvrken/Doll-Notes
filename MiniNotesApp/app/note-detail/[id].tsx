@@ -3,22 +3,28 @@ import { View, StyleSheet, Text, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { deleteTask } from "../../lib/database";
 
+const PRIORITY_COLORS: Record<string, { bg: string; text: string }> = {
+  High:   { bg: '#FFE6E6', text: '#ff918fff' },
+  Medium: { bg: '#FFF3E0', text: '#f3c184ff' },
+  Low:    { bg: '#E8F5E9', text: '#98f89dff' },
+  None:   { bg: '#F3F3F3', text: '#999' },
+};
+
 export default function NoteDetailScreen() {
   const router = useRouter();
-  const { id, title, description, category } = useLocalSearchParams<{
+  const { id, title, description, priority } = useLocalSearchParams<{
     id: string;
     title: string;
     description: string;
-    category: string;
+    priority: string;
   }>();
+
+  const priorityKey = priority ?? 'None';
+  const colors = PRIORITY_COLORS[priorityKey] ?? PRIORITY_COLORS['None'];
 
   const handleDelete = () => {
     Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      {
-        text: "Cancel",
-        onPress: () => {},
-        style: "cancel",
-      },
+      { text: "Cancel", style: "cancel" },
       {
         text: "Delete",
         onPress: () => {
@@ -26,7 +32,7 @@ export default function NoteDetailScreen() {
             try {
               deleteTask(Number(id));
               router.back();
-            } catch (error) {
+            } catch {
               Alert.alert("Error", "Failed to delete note");
             }
           }
@@ -38,12 +44,12 @@ export default function NoteDetailScreen() {
 
   const handleEdit = () => {
     router.push({
-      pathname: '/add-task',
+      pathname: '/(tabs)/add-note',
       params: {
-        id: id,
-        title: title,
-        description: description,
-        category: category,
+        id,
+        title,
+        description,
+        priority,
         isEditing: 'true',
       },
     });
@@ -60,41 +66,38 @@ export default function NoteDetailScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Note Detail</Text>
+        <Text style={styles.pageTitle}>Note Detail</Text>
 
-        <View style={styles.detailItem}>
-          <Text style={styles.label}>Title:</Text>
-          <Text style={styles.value}>{title}</Text>
+        {/* Title */}
+        <View style={styles.detailCard}>
+          <Text style={styles.detailLabel}>TITLE</Text>
+          <Text style={styles.detailValue}>{title}</Text>
         </View>
 
-        <View style={styles.detailItem}>
-          <Text style={styles.label}>Description:</Text>
-          <Text style={styles.value}>{description || "N/A"}</Text>
+        {/* Description */}
+        <View style={styles.detailCard}>
+          <Text style={styles.detailLabel}>DESCRIPTION</Text>
+          <Text style={styles.detailValue}>{description || "No description provided."}</Text>
         </View>
 
-        <View style={styles.detailItem}>
-          <Text style={styles.label}>Category:</Text>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{category || "Personal"}</Text>
+        {/* Priority */}
+        <View style={styles.detailCard}>
+          <Text style={styles.detailLabel}>PRIORITY</Text>
+          <View style={[styles.priorityBadge, { backgroundColor: colors.bg }]}>
+            <Text style={[styles.priorityBadgeText, { color: colors.text }]}>
+              {priorityKey}
+            </Text>
           </View>
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={handleEdit}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.editButtonText}>Edit Note</Text>
+        <TouchableOpacity style={styles.editButton} onPress={handleEdit} activeOpacity={0.8}>
+          <Text style={styles.editButtonText}>✏️  Edit Note</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleDelete}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.deleteButtonText}>Delete Note</Text>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete} activeOpacity={0.8}>
+          <Text style={styles.deleteButtonText}>🗑️  Delete Note</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -104,53 +107,55 @@ export default function NoteDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f9f0f5",
   },
   content: {
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#FF6B9D",
     marginBottom: 20,
-    color: "#333",
   },
-  detailItem: {
+  detailCard: {
     backgroundColor: "white",
     padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    shadowColor: "#000",
+    borderRadius: 12,
+    marginBottom: 14,
+    shadowColor: "#FFB3D9",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  label: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#999",
-    textTransform: "uppercase",
+  detailLabel: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#ccc",
+    letterSpacing: 1,
     marginBottom: 6,
+    textTransform: "uppercase",
   },
-  value: {
+  detailValue: {
     fontSize: 16,
     color: "#333",
     fontWeight: "500",
+    lineHeight: 22,
   },
-  categoryBadge: {
-    backgroundColor: "#FFE6F0",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+  priorityBadge: {
     alignSelf: "flex-start",
-    marginTop: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginTop: 4,
   },
-  categoryText: {
-    fontWeight: "600",
-    fontSize: 12,
-    color: "#FFB3D9",
+  priorityBadgeText: {
+    fontSize: 13,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   buttonContainer: {
     padding: 20,
@@ -159,24 +164,34 @@ const styles = StyleSheet.create({
   editButton: {
     backgroundColor: "#FFB3D9",
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#FFB3D9",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 3,
   },
   editButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: "700",
   },
   deleteButton: {
     backgroundColor: "#FF3B30",
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 12,
+    alignItems: "center",
+    shadowColor: "#FF3B30",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
   },
   deleteButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: "700",
   },
   errorText: {
     fontSize: 16,
